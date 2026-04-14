@@ -49,7 +49,7 @@ class AuthController extends Controller
 
     public function updateProfile(Request $request) {
         $profile = $request->user()->profile;
-        $profile->update($request->only('bio', 'gender', 'interested_in', 'birthdate'));
+        $profile->update($request->only('bio', 'gender', 'interested_in', 'birthdate', 'photo_url'));
         return response()->json($profile);
     }
 }

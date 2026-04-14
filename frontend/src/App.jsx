@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import AuthPage from './pages/AuthPage';
 import SwipePage from './pages/SwipePage';
 import MatchesPage from './pages/MatchesPage';
+import ProfilePage from './pages/ProfilePage';
 import MainLayout from './layouts/MainLayout';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<MainLayout setToken={setToken} />}>
           <Route index element={<SwipePage />} />
           <Route path="matches" element={<MatchesPage />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
