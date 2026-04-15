@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Flame, MessageCircle, User as UserIcon, LogOut } from 'lucide-react';
+import { Flame, MessageCircle, User as UserIcon, LogOut, Settings } from 'lucide-react';
 
 export default function MainLayout({ setToken }) {
   const location = useLocation();
@@ -22,7 +22,8 @@ export default function MainLayout({ setToken }) {
   const navItems = [
     { path: '/', icon: Flame, label: 'Discover' },
     { path: '/matches', icon: MessageCircle, label: 'Messages' },
-    { path: '/profile', icon: UserIcon, label: 'Profile' }
+    { path: '/profile', icon: UserIcon, label: 'Profile' },
+    { path: '/settings', icon: Settings, label: 'Settings' }
   ];
 
   return (
