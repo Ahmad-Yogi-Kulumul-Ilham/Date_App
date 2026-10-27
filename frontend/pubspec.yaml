@@ -1,0 +1,25 @@
+name: leo_chat
+description: "Leo: aplikasi dating untuk menemukan, match, dan chat dengan orang di sekitar."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  dio: ^5.11.1
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  flutter_secure_storage: ^11.2.0
+  geolocator: ^14.1.2
+  go_router: ^18.1.1
+  google_fonts: 8.0.0
+  image_picker: ^1.2.4
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
