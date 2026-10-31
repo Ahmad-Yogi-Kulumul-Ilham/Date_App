@@ -14,6 +14,8 @@ Aplikasi dating: temukan orang di sekitar, swipe, match, lalu chat.
 ├── backend/             API Goravel (lihat backend/README.md)
 ├── frontend/            aplikasi Flutter (lihat frontend/README.md)
 ├── docker-compose.yml   MySQL + Redis untuk development
+├── docker-compose.prod.yml  backend + Redis untuk VPS
+├── deploy/              panduan dan konfigurasi Nginx untuk production
 └── .github/workflows/   CI: format, lint, dan test untuk kedua sisi
 ```
 
@@ -45,6 +47,10 @@ Akun demo dari seeder: **demo@leochat.id** / **password123**. Akun ini berlokasi
 Discover memakai lokasi HP. Di emulator, atur lokasi ke sekitar Bandung (-6.90, 107.61) lewat *Extended controls → Location* supaya profil demo muncul.
 
 Foto profil disajikan dari URL berdasarkan `APP_URL`. Untuk Android emulator, isi `APP_URL=http://10.0.2.2:3000` di `backend/.env` supaya gambar bisa dimuat.
+
+## Deploy
+
+Panduan deploy ke VPS (`l.duzi.live`) ada di [deploy/README.md](deploy/README.md).
 
 ## API
 
