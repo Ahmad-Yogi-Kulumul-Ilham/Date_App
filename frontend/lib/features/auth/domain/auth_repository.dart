@@ -43,6 +43,10 @@ abstract interface class AuthRepository {
 
   Future<void> logout();
 
+  /// Permanently deletes the signed-in user's account after the server checks
+  /// [password], then clears the stored session.
+  Future<void> deleteAccount(String password);
+
   /// Emits when the server rejects the session and it cannot be refreshed.
   Stream<void> get sessionExpired;
 }

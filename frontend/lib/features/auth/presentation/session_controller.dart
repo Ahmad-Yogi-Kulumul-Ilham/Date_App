@@ -41,6 +41,11 @@ class SessionController extends AsyncNotifier<UserProfile?> {
     state = const AsyncData(null);
   }
 
+  Future<void> deleteAccount(String password) async {
+    await _repository.deleteAccount(password);
+    state = const AsyncData(null);
+  }
+
   /// Replaces the cached profile after it was changed elsewhere (edit, photos).
   void updateProfile(UserProfile profile) => state = AsyncData(profile);
 }

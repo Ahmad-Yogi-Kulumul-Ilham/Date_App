@@ -77,6 +77,15 @@ class FakeAuthRepository implements AuthRepository {
 
   @override
   Future<void> logout() async => logoutCalls++;
+
+  ApiException? deleteAccountError;
+  String? deletedWithPassword;
+
+  @override
+  Future<void> deleteAccount(String password) async {
+    if (deleteAccountError != null) throw deleteAccountError!;
+    deletedWithPassword = password;
+  }
 }
 
 class FakeLocationService implements LocationService {

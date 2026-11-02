@@ -58,6 +58,12 @@ final class ApiAuthRepository implements AuthRepository {
     await _tokens.clear();
   }
 
+  @override
+  Future<void> deleteAccount(String password) async {
+    await _api.delete('/me', body: {'password': password});
+    await _tokens.clear();
+  }
+
   Future<UserProfile> _authenticate(
     String path,
     Map<String, dynamic> body,
