@@ -77,4 +77,32 @@ void main() {
     expect(auth.logoutCalls, 1);
     expect(container.read(sessionControllerProvider).value, isNull);
   });
+
+  test('deleting the account signs the user out', () async {
+    auth.restored = testProfile();
+    await container.read(sessionControllerProvider.future);
+
+    await container
+        .read(sessionControllerProvider.notifier)
+        .deleteAccount('rahasia123');
+
+    expect(auth.deletedWithPassword, 'rahasia123');
+    expect(container.read(sessionControllerProvider).value, isNull);
+  });
+
+  test('a failed deletion keeps the user signed in', () async {
+    auth.restored = testProfile();
+    await container.read(sessionControllerProvider.future);
+    auth.deleteAccountError = const ApiException(
+      code: 'wrong_password',
+      message: 'Password salah.',
+      statusCode: 422,
+    );
+
+    await expectLater(
+      container.read(sessionControllerProvider.notifier).deleteAccount('salah'),
+      throwsA(isA<ApiException>()),
+    );
+    expect(container.read(sessionControllerProvider).value?.name, 'Rina');
+  });
 }
