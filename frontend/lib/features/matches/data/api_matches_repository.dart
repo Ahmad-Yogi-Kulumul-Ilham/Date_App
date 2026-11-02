@@ -22,4 +22,7 @@ final class ApiMatchesRepository implements MatchesRepository {
         MatchSummary.fromJson(item as Map<String, dynamic>),
     ];
   }
+
+  @override
+  Future<void> unmatch(int matchId) => _api.delete('/matches/$matchId');
 }
