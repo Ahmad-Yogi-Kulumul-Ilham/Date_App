@@ -13,6 +13,11 @@ import (
 )
 
 func newSwipeFixture() (*SwipeService, *fakeSwipes, *fakeMatches) {
+	svc, swipes, matches, _ := newSwipeFixtureWithBlocks()
+	return svc, swipes, matches
+}
+
+func newSwipeFixtureWithBlocks() (*SwipeService, *fakeSwipes, *fakeMatches, *fakeBlocks) {
 	birth := time.Date(1998, 1, 1, 0, 0, 0, 0, time.UTC)
 	users := newFakeUsers(
 		user(1, models.GenderMale, models.PreferenceFemale, birth),
@@ -20,7 +25,8 @@ func newSwipeFixture() (*SwipeService, *fakeSwipes, *fakeMatches) {
 	)
 	swipes := &fakeSwipes{}
 	matches := &fakeMatches{}
-	return NewSwipeService(users, swipes, matches), swipes, matches
+	blocks := &fakeBlocks{}
+	return NewSwipeService(users, swipes, matches, blocks), swipes, matches, blocks
 }
 
 func TestSwipeService_Swipe(t *testing.T) {
@@ -92,5 +98,17 @@ func TestSwipeService_Swipe(t *testing.T) {
 		_, err := svc.Swipe(ctx, 1, 99, models.SwipeLike)
 
 		assert.ErrorIs(t, err, apperr.ErrUserNotFound)
+	})
+
+	t.Run("treats a blocked user as missing in both directions", func(t *testing.T) {
+		svc, swipes, matches, blocks := newSwipeFixtureWithBlocks()
+		swipes.rows = append(swipes.rows, models.Swipe{SwiperID: 1, SwipedID: 2, Direction: models.SwipeLike})
+		blocks.rows = append(blocks.rows, models.Block{BlockerID: 1, BlockedID: 2})
+
+		_, err := svc.Swipe(ctx, 2, 1, models.SwipeLike)
+
+		assert.ErrorIs(t, err, apperr.ErrUserNotFound)
+		assert.Len(t, swipes.rows, 1, "the blocked user's swipe is not recorded")
+		assert.Empty(t, matches.rows)
 	})
 }

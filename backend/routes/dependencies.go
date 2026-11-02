@@ -31,6 +31,7 @@ func newAPIControllers() apiControllers {
 	swipes := repositories.NewSwipeRepository(orm)
 	matches := repositories.NewMatchRepository(orm)
 	messages := repositories.NewMessageRepository(orm)
+	blocks := repositories.NewBlockRepository(orm)
 
 	presenter := resources.NewPresenter(publicDisk.Url, now)
 
@@ -38,7 +39,7 @@ func newAPIControllers() apiControllers {
 		auth:      controllers.NewAuthController(services.NewAuthService(users, facades.Hash(), now), presenter),
 		profile:   controllers.NewProfileController(services.NewProfileService(users, photos, publicDisk, now), presenter),
 		discovery: controllers.NewDiscoveryController(services.NewDiscoveryService(users, candidates, now), presenter),
-		swipe:     controllers.NewSwipeController(services.NewSwipeService(users, swipes, matches)),
+		swipe:     controllers.NewSwipeController(services.NewSwipeService(users, swipes, matches, blocks)),
 		match:     controllers.NewMatchController(services.NewChatService(matches, messages, now), presenter),
 	}
 }

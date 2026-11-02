@@ -11,10 +11,11 @@ type SwipeService struct {
 	users   UserRepository
 	swipes  SwipeRepository
 	matches MatchRepository
+	blocks  BlockRepository
 }
 
-func NewSwipeService(users UserRepository, swipes SwipeRepository, matches MatchRepository) *SwipeService {
-	return &SwipeService{users: users, swipes: swipes, matches: matches}
+func NewSwipeService(users UserRepository, swipes SwipeRepository, matches MatchRepository, blocks BlockRepository) *SwipeService {
+	return &SwipeService{users: users, swipes: swipes, matches: matches, blocks: blocks}
 }
 
 // SwipeResult carries the new match when the swipe completed a mutual like.
@@ -30,6 +31,15 @@ func (s *SwipeService) Swipe(ctx context.Context, swiperID, swipedID uint, direc
 	}
 	if _, err := s.users.FindByID(ctx, swipedID); err != nil {
 		return SwipeResult{}, err
+	}
+
+	blocked, err := s.blocks.ExistsBetween(ctx, swiperID, swipedID)
+	if err != nil {
+		return SwipeResult{}, err
+	}
+	if blocked {
+		// Same answer as for a missing user, so a block cannot be detected.
+		return SwipeResult{}, apperr.ErrUserNotFound
 	}
 
 	already, err := s.swipes.Exists(ctx, swiperID, swipedID)
