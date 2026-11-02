@@ -3,6 +3,7 @@ import 'package:leo_chat/features/auth/domain/auth_repository.dart';
 import 'package:leo_chat/features/discover/domain/candidate.dart';
 import 'package:leo_chat/features/matches/domain/match_summary.dart';
 import 'package:leo_chat/features/profile/domain/user_profile.dart';
+import 'package:leo_chat/features/safety/domain/report_reason.dart';
 
 void main() {
   test('UserProfile parses the /me payload', () {
@@ -81,5 +82,16 @@ void main() {
 
     expect(data.toJson()['birth_date'], '2000-05-01');
     expect(data.toJson()['name'], 'Rina');
+  });
+
+  test('ReportReason values match what the backend accepts', () {
+    expect(ReportReason.values.map((r) => r.apiValue), [
+      'fake_profile',
+      'inappropriate',
+      'harassment',
+      'spam',
+      'underage',
+      'other',
+    ]);
   });
 }
