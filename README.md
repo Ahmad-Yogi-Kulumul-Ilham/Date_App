@@ -70,16 +70,20 @@ Base URL `/api/v1`. Semua respons sukses berbentuk `{"data": ...}`, dan error be
 | POST | `/auth/logout` | Masukkan token ke blacklist |
 | GET | `/me` | Profil sendiri |
 | PATCH | `/me` | Ubah nama, bio, atau preferensi |
+| DELETE | `/me` | Hapus akun permanen. Body `{"password": "..."}`, password salah dibalas 422 `wrong_password` |
 | PUT | `/me/location` | Perbarui lokasi |
 | POST | `/me/photos` | Unggah foto (multipart `photo`, jpg/png/webp, maksimal 5 MB, maksimal 6 foto) |
 | DELETE | `/me/photos/{id}` | Hapus foto |
 | GET | `/discover` | Kandidat terdekat yang belum di-swipe. Query opsional: `radius_km`, `min_age`, `max_age`, `limit` |
 | POST | `/swipes` | `{"user_id": 2, "direction": "like" \| "pass"}` mengembalikan `{"matched": true, "match_id": 5}` |
 | GET | `/matches` | Daftar match beserta pesan terakhir |
+| DELETE | `/matches/{id}` | Batalkan match. Percakapan ikut terhapus untuk kedua pihak |
 | GET | `/matches/{id}/messages` | Riwayat pesan, terbaru dulu. Pakai `before_id` untuk halaman berikutnya |
 | POST | `/matches/{id}/messages` | Kirim pesan |
+| POST | `/blocks` | `{"user_id": 2}` memblokir pengguna. Aman diulang |
+| POST | `/reports` | `{"user_id": 2, "reason": "harassment", "details": "..."}`. Sekaligus memblokir. `reason`: `fake_profile`, `inappropriate`, `harassment`, `spam`, `underage`, `other` |
 
-Semua endpoint selain register, login, dan refresh butuh header `Authorization: Bearer <token>`. Login dan register dibatasi 10 permintaan per menit per IP, swipe 120 per menit, dan chat 60 per menit per pengguna.
+Semua endpoint selain register, login, dan refresh butuh header `Authorization: Bearer <token>`. Login, register, dan hapus akun dibatasi 10 permintaan per menit per IP. Per pengguna, swipe dibatasi 120 per menit, chat 60 per menit, serta blokir dan lapor 20 per menit.
 
 ## Keputusan desain
 
@@ -88,12 +92,15 @@ Semua endpoint selain register, login, dan refresh butuh header `Authorization: 
 - **Pencarian terdekat di MySQL.** Kotak batas (bounding box) di kolom `latitude` dan `longitude` yang berindeks menyaring kandidat dulu, lalu `ST_Distance_Sphere` menghitung jarak sebenarnya.
 - **Match tanpa duplikat.** Pasangan disimpan berurutan (`user_one_id < user_two_id`) dengan unique index. Like bersamaan dari dua sisi tetap menghasilkan satu match.
 - **ID match tidak bisa ditebak-tebak.** Orang luar yang mengakses match orang lain mendapat 404, bukan 403.
+- **Blokir berlaku dua arah dan tidak ketahuan.** Blokir menyembunyikan kedua orang dari Discover masing-masing dan menghapus match beserta percakapannya. Swipe ke orang yang terblokir dijawab `user_not_found`, sama seperti pengguna yang tidak ada, jadi pihak yang diblokir tidak bisa tahu.
+- **Melapor sekaligus memblokir.** Pelapor tidak perlu langkah tambahan untuk menjauh dari orang yang dilaporkan. Laporan disimpan untuk moderator, satu laporan per pasangan pelapor dan terlapor.
+- **Hapus akun minta password lagi.** HP yang tidak terkunci saja tidak cukup untuk menghapus akun. Password yang salah dibalas 422, bukan 401, karena aplikasi menganggap 401 sebagai sesi berakhir. Semua data ikut terhapus lewat foreign key, lalu file foto dibersihkan.
 - **Lapisan yang bisa dites.** Service hanya bergantung pada interface (`backend/app/services/ports.go`), dan controller Flutter hanya bergantung pada repository abstrak. Keduanya dites dengan implementasi palsu, tanpa database atau server.
 
 ## Langkah berikutnya
 
 - Chat realtime dengan WebSocket, ditambah Redis Pub/Sub saat server lebih dari satu. Saat ini chat memakai polling tiap 4 detik, dan perubahannya cukup di `ChatController`.
 - Push notification (FCM) untuk match dan pesan baru.
-- Fitur block dan report, plus moderasi foto.
+- Panel moderasi untuk meninjau laporan, daftar blokir dengan opsi buka blokir, dan moderasi foto.
 - Simpan foto di object storage (Cloudflare R2 atau S3) lewat driver filesystem Goravel.
 - Test integrasi repository terhadap MySQL sungguhan, misalnya dengan `facades.Testing().Docker()`.
