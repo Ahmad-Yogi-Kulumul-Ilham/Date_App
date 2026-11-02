@@ -71,6 +71,19 @@ void main() {
     ]);
   });
 
+  test('removing a card skips it without recording a swipe', () async {
+    final candidates = await load();
+
+    container
+        .read(discoverControllerProvider.notifier)
+        .remove(candidates.first);
+
+    expect(container.read(discoverControllerProvider).value?.map((c) => c.id), [
+      3,
+    ]);
+    expect(discover.swipes, isEmpty);
+  });
+
   test('a failed swipe puts the card back on top', () async {
     final candidates = await load();
     discover.swipeError = const ApiException(

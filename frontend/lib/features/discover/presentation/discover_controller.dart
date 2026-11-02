@@ -31,10 +31,7 @@ class DiscoverController extends AsyncNotifier<List<Candidate>> {
     Candidate candidate,
     SwipeDirection direction,
   ) async {
-    state = AsyncData([
-      for (final c in state.value ?? const <Candidate>[])
-        if (c.id != candidate.id) c,
-    ]);
+    state = AsyncData(_without(candidate));
 
     try {
       final outcome = await ref
@@ -48,4 +45,13 @@ class DiscoverController extends AsyncNotifier<List<Candidate>> {
       rethrow;
     }
   }
+
+  /// Drops [candidate] from the stack without recording a swipe, for example
+  /// after they were blocked or reported.
+  void remove(Candidate candidate) => state = AsyncData(_without(candidate));
+
+  List<Candidate> _without(Candidate candidate) => [
+    for (final c in state.value ?? const <Candidate>[])
+      if (c.id != candidate.id) c,
+  ];
 }
