@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	LimiterAuth  = "auth"
-	LimiterSwipe = "swipe"
-	LimiterChat  = "chat"
+	LimiterAuth   = "auth"
+	LimiterSwipe  = "swipe"
+	LimiterChat   = "chat"
+	LimiterSafety = "safety"
 )
 
 // RegisterRateLimiters defines the named limiters used by the throttle middleware.
@@ -30,6 +31,11 @@ func RegisterRateLimiters() {
 
 	limiter.For(LimiterChat, func(ctx http.Context) http.Limit {
 		return limit.PerMinute(60).By(userKey(ctx)).Response(tooManyRequests)
+	})
+
+	// Blocking and reporting are rare; a burst usually means a script.
+	limiter.For(LimiterSafety, func(ctx http.Context) http.Limit {
+		return limit.PerMinute(20).By(userKey(ctx)).Response(tooManyRequests)
 	})
 }
 
