@@ -128,6 +128,40 @@ func (f *fakeMatches) Delete(_ context.Context, id uint) error {
 	return nil
 }
 
+func (f *fakeMatches) DeleteBetween(_ context.Context, a, b uint) error {
+	one, two := models.OrderedPair(a, b)
+	for i := range f.rows {
+		if f.rows[i].UserOneID == one && f.rows[i].UserTwoID == two {
+			f.rows = append(f.rows[:i], f.rows[i+1:]...)
+			return nil
+		}
+	}
+	return nil
+}
+
+type fakeBlocks struct {
+	rows []models.Block
+}
+
+func (f *fakeBlocks) Create(_ context.Context, b *models.Block) error {
+	for _, row := range f.rows {
+		if row.BlockerID == b.BlockerID && row.BlockedID == b.BlockedID {
+			return nil
+		}
+	}
+	f.rows = append(f.rows, *b)
+	return nil
+}
+
+func (f *fakeBlocks) ExistsBetween(_ context.Context, a, b uint) (bool, error) {
+	for _, row := range f.rows {
+		if (row.BlockerID == a && row.BlockedID == b) || (row.BlockerID == b && row.BlockedID == a) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 type fakeMessages struct {
 	rows       []models.Message
 	markedUpTo uint

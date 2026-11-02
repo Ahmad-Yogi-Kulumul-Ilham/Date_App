@@ -81,6 +81,15 @@ type MatchRepository interface {
 	ListForUser(ctx context.Context, userID uint) ([]MatchSummary, error)
 	// Delete removes the match together with its messages.
 	Delete(ctx context.Context, id uint) error
+	// DeleteBetween removes the pair's match, if any, with its messages.
+	DeleteBetween(ctx context.Context, userA, userB uint) error
+}
+
+type BlockRepository interface {
+	// Create records the block; blocking the same user twice is not an error.
+	Create(ctx context.Context, block *models.Block) error
+	// ExistsBetween reports whether either user has blocked the other.
+	ExistsBetween(ctx context.Context, userA, userB uint) (bool, error)
 }
 
 type MessageRepository interface {
