@@ -24,6 +24,8 @@ func Api() {
 
 			r.Get("/me", c.profile.Show)
 			r.Patch("/me", c.profile.Update)
+			// Throttled per IP like login, since it checks a password.
+			r.Middleware(middleware.Throttle(appmiddleware.LimiterAuth)).Delete("/me", c.account.Destroy)
 			r.Put("/me/location", c.profile.UpdateLocation)
 			r.Post("/me/photos", c.profile.UploadPhoto)
 			r.Delete("/me/photos/{id}", c.profile.DeletePhoto)

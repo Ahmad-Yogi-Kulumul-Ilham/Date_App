@@ -63,3 +63,15 @@ func (r *LoginRequest) Rules(http.Context) map[string]any {
 		"password": "required|string",
 	}
 }
+
+type DeleteAccountRequest struct {
+	Password string `form:"password" json:"password"`
+}
+
+func (r *DeleteAccountRequest) Authorize(http.Context) error { return nil }
+
+func (r *DeleteAccountRequest) Rules(http.Context) map[string]any {
+	return map[string]any{
+		"password": "required|string",
+	}
+}
