@@ -33,6 +33,11 @@ WHERE u.id <> ?
   AND NOT EXISTS (
       SELECT 1 FROM swipes s WHERE s.swiper_id = ? AND s.swiped_id = u.id
   )
+  AND NOT EXISTS (
+      SELECT 1 FROM blocks b
+      WHERE (b.blocker_id = ? AND b.blocked_id = u.id)
+         OR (b.blocker_id = u.id AND b.blocked_id = ?)
+  )
 HAVING distance_meters <= ?
 ORDER BY distance_meters
 LIMIT ?`
@@ -62,6 +67,7 @@ func (r *CandidateRepository) FindCandidates(ctx context.Context, q services.Can
 		genders,
 		string(q.ViewerGender),
 		q.ViewerID,
+		q.ViewerID, q.ViewerID,
 		q.RadiusMeters,
 		q.Limit,
 	).Scan(&rows)
