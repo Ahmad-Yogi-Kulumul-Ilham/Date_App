@@ -42,8 +42,8 @@ class ApiClient {
   Future<T> patch<T>(String path, {Object? body}) =>
       _send(() => _dio.patch<Object?>(path, data: body));
 
-  Future<void> delete(String path) =>
-      _send<Object?>(() => _dio.delete<Object?>(path));
+  Future<void> delete(String path, {Object? body}) =>
+      _send<Object?>(() => _dio.delete<Object?>(path, data: body));
 
   void dispose() => _sessionExpired.close();
 
