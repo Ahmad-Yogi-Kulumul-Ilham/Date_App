@@ -39,6 +39,8 @@ var (
 	ErrInvalidCredentials = newError(KindUnauthorized, "invalid_credentials", "Email atau password salah.")
 	ErrEmailTaken         = newError(KindConflict, "email_taken", "Email sudah terdaftar.")
 	ErrUnderage           = newError(KindInvalid, "underage", "Kamu harus berusia minimal 18 tahun.")
+	// Invalid rather than unauthorized: clients treat a 401 as an ended session.
+	ErrWrongPassword = newError(KindInvalid, "wrong_password", "Password salah.")
 
 	ErrUserNotFound     = newError(KindNotFound, "user_not_found", "Pengguna tidak ditemukan.")
 	ErrLocationRequired = newError(KindInvalid, "location_required", "Aktifkan lokasi untuk mulai mencari.")

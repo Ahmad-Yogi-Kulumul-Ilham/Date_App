@@ -56,6 +56,11 @@ func (f *fakeUsers) Save(_ context.Context, u *models.User) error {
 	return nil
 }
 
+func (f *fakeUsers) Delete(_ context.Context, id uint) error {
+	delete(f.byID, id)
+	return nil
+}
+
 type fakeHasher struct{}
 
 func (fakeHasher) Make(v string) (string, error) { return "hashed:" + v, nil }

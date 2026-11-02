@@ -18,6 +18,8 @@ type UserRepository interface {
 	FindByEmail(ctx context.Context, email string) (*models.User, error)
 	Create(ctx context.Context, user *models.User) error
 	Save(ctx context.Context, user *models.User) error
+	// Delete removes the user and, through foreign keys, everything tied to them.
+	Delete(ctx context.Context, id uint) error
 }
 
 type PhotoRepository interface {
