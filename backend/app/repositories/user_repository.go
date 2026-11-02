@@ -63,3 +63,10 @@ func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 func (r *UserRepository) Save(ctx context.Context, user *models.User) error {
 	return r.query(ctx).Omit(orm.Associations).Save(user)
 }
+
+// Delete removes the user. Their photos, swipes, matches, messages, blocks and
+// reports are removed with them through the foreign keys.
+func (r *UserRepository) Delete(ctx context.Context, id uint) error {
+	_, err := r.query(ctx).Where("id = ?", id).Delete(&models.User{})
+	return err
+}
