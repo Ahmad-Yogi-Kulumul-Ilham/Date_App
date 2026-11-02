@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/router/routes.dart';
 import '../../../core/utils/date_format.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/profile_photo.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../matches/domain/match_summary.dart';
+import '../../safety/presentation/report_sheet.dart';
+import '../../safety/presentation/safety_controller.dart';
 import '../domain/chat_message.dart';
 import 'chat_controller.dart';
 
@@ -41,6 +46,7 @@ class ChatPage extends ConsumerWidget {
                   ),
                 ],
               ),
+        actions: [_ChatMenu(matchId: matchId, partner: partner)],
       ),
       body: SafeArea(
         child: Column(
@@ -73,6 +79,99 @@ class ChatPage extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+enum _ChatAction { unmatch, block, report }
+
+/// Ways out of the conversation. Block and report need to know who the partner
+/// is, so they are hidden when the page was opened without that context.
+class _ChatMenu extends ConsumerWidget {
+  const _ChatMenu({required this.matchId, this.partner});
+
+  final int matchId;
+  final MatchPartner? partner;
+
+  Future<void> _onSelected(
+    BuildContext context,
+    WidgetRef ref,
+    _ChatAction action,
+  ) async {
+    final safety = ref.read(safetyControllerProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
+    final name = partner?.name ?? 'dia';
+
+    try {
+      switch (action) {
+        case _ChatAction.unmatch:
+          final confirmed = await showConfirmDialog(
+            context,
+            title: 'Batalkan match?',
+            message:
+                'Percakapan ini akan dihapus untuk kalian berdua dan tidak '
+                'bisa dikembalikan.',
+            confirmLabel: 'Batalkan match',
+            destructive: true,
+          );
+          if (!confirmed) return;
+          await safety.unmatch(matchId);
+        case _ChatAction.block:
+          final confirmed = await showConfirmDialog(
+            context,
+            title: 'Blokir $name?',
+            message:
+                'Kalian tidak akan saling melihat lagi dan percakapan ini '
+                'dihapus. $name tidak akan diberi tahu.',
+            confirmLabel: 'Blokir',
+            destructive: true,
+          );
+          if (!confirmed) return;
+          await safety.block(partner!.id);
+        case _ChatAction.report:
+          final draft = await showReportSheet(context, name: name);
+          if (draft == null) return;
+          await safety.report(
+            partner!.id,
+            draft.reason,
+            details: draft.details,
+          );
+          messenger.showSnackBar(
+            const SnackBar(
+              content: Text('Terima kasih, laporanmu sudah kami terima.'),
+            ),
+          );
+      }
+      if (!context.mounted) return;
+      // The conversation no longer exists, so leave it.
+      context.canPop() ? context.pop() : context.go(Routes.matches);
+    } on ApiException catch (e) {
+      if (context.mounted) showErrorSnackBar(context, e.message);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final busy = ref.watch(safetyControllerProvider);
+    final knowsPartner = partner != null;
+
+    return PopupMenuButton<_ChatAction>(
+      enabled: !busy,
+      tooltip: 'Opsi lainnya',
+      onSelected: (action) => _onSelected(context, ref, action),
+      itemBuilder: (_) => [
+        const PopupMenuItem(
+          value: _ChatAction.unmatch,
+          child: Text('Batalkan match'),
+        ),
+        if (knowsPartner) ...[
+          const PopupMenuItem(value: _ChatAction.block, child: Text('Blokir')),
+          const PopupMenuItem(
+            value: _ChatAction.report,
+            child: Text('Laporkan'),
+          ),
+        ],
+      ],
     );
   }
 }
