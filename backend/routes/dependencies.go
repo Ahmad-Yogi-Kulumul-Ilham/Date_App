@@ -33,6 +33,7 @@ func newAPIControllers() apiControllers {
 	matches := repositories.NewMatchRepository(orm)
 	messages := repositories.NewMessageRepository(orm)
 	blocks := repositories.NewBlockRepository(orm)
+	reports := repositories.NewReportRepository(orm)
 
 	presenter := resources.NewPresenter(publicDisk.Url, now)
 
@@ -42,6 +43,6 @@ func newAPIControllers() apiControllers {
 		discovery: controllers.NewDiscoveryController(services.NewDiscoveryService(users, candidates, now), presenter),
 		swipe:     controllers.NewSwipeController(services.NewSwipeService(users, swipes, matches, blocks)),
 		match:     controllers.NewMatchController(services.NewChatService(matches, messages, now), presenter),
-		safety:    controllers.NewSafetyController(services.NewSafetyService(users, blocks, matches)),
+		safety:    controllers.NewSafetyController(services.NewSafetyService(users, blocks, reports, matches)),
 	}
 }

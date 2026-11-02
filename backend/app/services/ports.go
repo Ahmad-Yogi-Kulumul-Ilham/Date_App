@@ -92,6 +92,11 @@ type BlockRepository interface {
 	ExistsBetween(ctx context.Context, userA, userB uint) (bool, error)
 }
 
+type ReportRepository interface {
+	// Create stores the report; a repeat from the same reporter is ignored.
+	Create(ctx context.Context, report *models.Report) error
+}
+
 type MessageRepository interface {
 	Create(ctx context.Context, message *models.Message) error
 	// ListByMatch returns up to limit messages older than beforeID (0 = newest),

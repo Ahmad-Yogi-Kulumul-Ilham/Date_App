@@ -162,6 +162,15 @@ func (f *fakeBlocks) ExistsBetween(_ context.Context, a, b uint) (bool, error) {
 	return false, nil
 }
 
+type fakeReports struct {
+	rows []models.Report
+}
+
+func (f *fakeReports) Create(_ context.Context, r *models.Report) error {
+	f.rows = append(f.rows, *r)
+	return nil
+}
+
 type fakeMessages struct {
 	rows       []models.Message
 	markedUpTo uint

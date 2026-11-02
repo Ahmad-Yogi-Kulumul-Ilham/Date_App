@@ -52,5 +52,6 @@ var (
 	ErrMatchNotFound = newError(KindNotFound, "match_not_found", "Match tidak ditemukan.")
 	ErrMessageEmpty  = newError(KindInvalid, "message_empty", "Pesan tidak boleh kosong.")
 
-	ErrCannotBlockSelf = newError(KindInvalid, "cannot_block_self", "Tidak bisa memblokir diri sendiri.")
+	ErrCannotBlockSelf  = newError(KindInvalid, "cannot_block_self", "Tidak bisa memblokir diri sendiri.")
+	ErrCannotReportSelf = newError(KindInvalid, "cannot_report_self", "Tidak bisa melaporkan diri sendiri.")
 )
