@@ -68,3 +68,16 @@ func (c *MatchController) SendMessage(ctx http.Context) http.Response {
 	}
 	return responses.Created(ctx, c.presenter.Message(message, userID))
 }
+
+// Unmatch ends the match for both participants and deletes the conversation.
+func (c *MatchController) Unmatch(ctx http.Context) http.Response {
+	matchID, ok := routeID(ctx, "id")
+	if !ok {
+		return notFound(ctx)
+	}
+
+	if err := c.chat.Unmatch(ctx, middleware.CurrentUserID(ctx), matchID); err != nil {
+		return responses.Error(ctx, err)
+	}
+	return responses.NoContent(ctx)
+}

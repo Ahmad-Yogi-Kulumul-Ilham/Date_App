@@ -32,6 +32,7 @@ func Api() {
 			r.Middleware(middleware.Throttle(appmiddleware.LimiterSwipe)).Post("/swipes", c.swipe.Store)
 
 			r.Get("/matches", c.match.Index)
+			r.Delete("/matches/{id}", c.match.Unmatch)
 			r.Get("/matches/{id}/messages", c.match.Messages)
 			r.Middleware(middleware.Throttle(appmiddleware.LimiterChat)).Post("/matches/{id}/messages", c.match.SendMessage)
 		})
