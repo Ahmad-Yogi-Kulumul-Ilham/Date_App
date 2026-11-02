@@ -4,9 +4,12 @@ import '../../../../core/widgets/profile_photo.dart';
 import '../../domain/candidate.dart';
 
 class CandidateCard extends StatelessWidget {
-  const CandidateCard({super.key, required this.candidate});
+  const CandidateCard({super.key, required this.candidate, this.onMore});
 
   final Candidate candidate;
+
+  /// Shows an options button in the corner when set.
+  final VoidCallback? onMore;
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +80,17 @@ class CandidateCard extends StatelessWidget {
               ],
             ),
           ),
+          if (onMore != null)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: IconButton(
+                tooltip: 'Opsi lainnya',
+                onPressed: onMore,
+                style: IconButton.styleFrom(backgroundColor: Colors.black38),
+                icon: const Icon(Icons.more_horiz_rounded, color: onPhoto),
+              ),
+            ),
         ],
       ),
     );
