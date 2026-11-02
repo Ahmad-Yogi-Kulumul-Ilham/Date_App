@@ -61,6 +61,13 @@ func (r *MatchRepository) Delete(ctx context.Context, id uint) error {
 	return err
 }
 
+// DeleteBetween removes the pair's match, if there is one, with its messages.
+func (r *MatchRepository) DeleteBetween(ctx context.Context, userA, userB uint) error {
+	one, two := models.OrderedPair(userA, userB)
+	_, err := r.query(ctx).Where("user_one_id = ? AND user_two_id = ?", one, two).Delete(&models.Match{})
+	return err
+}
+
 const matchSummariesSQL = `
 SELECT m.id AS match_id,
        m.created_at AS matched_at,
