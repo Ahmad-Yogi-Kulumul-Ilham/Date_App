@@ -7,8 +7,12 @@ import 'package:leo_chat/features/chat/domain/chat_message.dart';
 import 'package:leo_chat/features/chat/domain/chat_repository.dart';
 import 'package:leo_chat/features/discover/domain/candidate.dart';
 import 'package:leo_chat/features/discover/domain/discover_repository.dart';
+import 'package:leo_chat/features/matches/domain/match_summary.dart';
+import 'package:leo_chat/features/matches/domain/matches_repository.dart';
 import 'package:leo_chat/features/profile/domain/profile_repository.dart';
 import 'package:leo_chat/features/profile/domain/user_profile.dart';
+import 'package:leo_chat/features/safety/domain/report_reason.dart';
+import 'package:leo_chat/features/safety/domain/safety_repository.dart';
 
 UserProfile testProfile({int id = 1, String name = 'Rina'}) => UserProfile(
   id: id,
@@ -130,6 +134,42 @@ class FakeDiscoverRepository implements DiscoverRepository {
     final matched =
         direction == SwipeDirection.like && likesBack.contains(userId);
     return SwipeOutcome(matched: matched, matchId: matched ? 99 : null);
+  }
+}
+
+class FakeMatchesRepository implements MatchesRepository {
+  int fetchCalls = 0;
+  final unmatched = <int>[];
+
+  @override
+  Future<List<MatchSummary>> fetchMatches() async {
+    fetchCalls++;
+    return const [];
+  }
+
+  @override
+  Future<void> unmatch(int matchId) async => unmatched.add(matchId);
+}
+
+class FakeSafetyRepository implements SafetyRepository {
+  final blocked = <int>[];
+  final reports = <(int, ReportReason, String)>[];
+  ApiException? error;
+
+  @override
+  Future<void> block(int userId) async {
+    if (error != null) throw error!;
+    blocked.add(userId);
+  }
+
+  @override
+  Future<void> report(
+    int userId,
+    ReportReason reason, {
+    String details = '',
+  }) async {
+    if (error != null) throw error!;
+    reports.add((userId, reason, details));
   }
 }
 
