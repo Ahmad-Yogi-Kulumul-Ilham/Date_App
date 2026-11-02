@@ -36,7 +36,10 @@ func Api() {
 			r.Get("/matches/{id}/messages", c.match.Messages)
 			r.Middleware(middleware.Throttle(appmiddleware.LimiterChat)).Post("/matches/{id}/messages", c.match.SendMessage)
 
-			r.Middleware(middleware.Throttle(appmiddleware.LimiterSafety)).Post("/blocks", c.safety.Block)
+			r.Middleware(middleware.Throttle(appmiddleware.LimiterSafety)).Group(func(r route.Router) {
+				r.Post("/blocks", c.safety.Block)
+				r.Post("/reports", c.safety.Report)
+			})
 		})
 	})
 }

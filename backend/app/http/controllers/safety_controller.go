@@ -29,3 +29,17 @@ func (c *SafetyController) Block(ctx http.Context) http.Response {
 	}
 	return responses.NoContent(ctx)
 }
+
+// Report flags a user for moderators and blocks them.
+func (c *SafetyController) Report(ctx http.Context) http.Response {
+	var req requests.ReportRequest
+	if res, ok := validate(ctx, &req); !ok {
+		return res
+	}
+
+	err := c.safety.Report(ctx, middleware.CurrentUserID(ctx), req.Target(), req.ReportReason(), req.Details)
+	if err != nil {
+		return responses.Error(ctx, err)
+	}
+	return responses.NoContent(ctx)
+}
