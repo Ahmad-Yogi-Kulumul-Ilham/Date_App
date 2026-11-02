@@ -8,6 +8,7 @@ import '../../../core/widgets/profile_photo.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../auth/presentation/session_controller.dart';
 import '../domain/user_profile.dart';
+import 'delete_account_dialog.dart';
 import 'edit_profile_sheet.dart';
 import 'profile_controller.dart';
 
@@ -121,6 +122,14 @@ class ProfilePage extends ConsumerWidget {
             onPressed: () => _confirmLogout(context, ref),
             icon: const Icon(Icons.logout),
             label: const Text('Keluar'),
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () => showDeleteAccountDialog(context),
+            style: TextButton.styleFrom(
+              foregroundColor: theme.colorScheme.error,
+            ),
+            child: const Text('Hapus akun'),
           ),
         ],
       ),
