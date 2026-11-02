@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/profile_photo.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../auth/presentation/session_controller.dart';
@@ -127,23 +128,12 @@ class ProfilePage extends ConsumerWidget {
   }
 
   Future<void> _confirmLogout(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Keluar dari akun?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Keluar'),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Keluar dari akun?',
+      confirmLabel: 'Keluar',
     );
-    if (confirmed ?? false) {
+    if (confirmed) {
       await ref.read(sessionControllerProvider.notifier).logout();
     }
   }
@@ -184,23 +174,12 @@ class _PhotoGrid extends ConsumerWidget {
   }
 
   Future<void> _delete(BuildContext context, WidgetRef ref, Photo photo) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Hapus foto ini?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Hapus'),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Hapus foto ini?',
+      confirmLabel: 'Hapus',
     );
-    if (!(confirmed ?? false)) return;
+    if (!confirmed) return;
 
     try {
       await ref.read(profileControllerProvider.notifier).deletePhoto(photo);
