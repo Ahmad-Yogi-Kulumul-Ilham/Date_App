@@ -35,6 +35,8 @@ func Api() {
 			r.Delete("/matches/{id}", c.match.Unmatch)
 			r.Get("/matches/{id}/messages", c.match.Messages)
 			r.Middleware(middleware.Throttle(appmiddleware.LimiterChat)).Post("/matches/{id}/messages", c.match.SendMessage)
+
+			r.Middleware(middleware.Throttle(appmiddleware.LimiterSafety)).Post("/blocks", c.safety.Block)
 		})
 	})
 }

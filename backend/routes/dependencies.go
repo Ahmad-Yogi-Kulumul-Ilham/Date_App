@@ -16,6 +16,7 @@ type apiControllers struct {
 	discovery *controllers.DiscoveryController
 	swipe     *controllers.SwipeController
 	match     *controllers.MatchController
+	safety    *controllers.SafetyController
 }
 
 // newAPIControllers wires repositories into services into controllers. This is
@@ -41,5 +42,6 @@ func newAPIControllers() apiControllers {
 		discovery: controllers.NewDiscoveryController(services.NewDiscoveryService(users, candidates, now), presenter),
 		swipe:     controllers.NewSwipeController(services.NewSwipeService(users, swipes, matches, blocks)),
 		match:     controllers.NewMatchController(services.NewChatService(matches, messages, now), presenter),
+		safety:    controllers.NewSafetyController(services.NewSafetyService(users, blocks, matches)),
 	}
 }
