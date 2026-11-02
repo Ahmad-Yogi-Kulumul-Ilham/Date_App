@@ -69,6 +69,15 @@ func (s *ChatService) Send(ctx context.Context, userID, matchID uint, body strin
 	return message, nil
 }
 
+// Unmatch ends the match for both users and deletes the conversation. Their
+// swipes stay, so the two are not shown to each other in discover again.
+func (s *ChatService) Unmatch(ctx context.Context, userID, matchID uint) error {
+	if _, err := s.participantMatch(ctx, userID, matchID); err != nil {
+		return err
+	}
+	return s.matches.Delete(ctx, matchID)
+}
+
 // participantMatch loads the match and hides it from non-participants with a
 // not-found error, so match IDs cannot be probed.
 func (s *ChatService) participantMatch(ctx context.Context, userID, matchID uint) (*models.Match, error) {

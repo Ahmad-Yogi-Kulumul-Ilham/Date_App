@@ -79,6 +79,8 @@ type MatchRepository interface {
 	// FindByID returns apperr.ErrMatchNotFound when no match exists.
 	FindByID(ctx context.Context, id uint) (*models.Match, error)
 	ListForUser(ctx context.Context, userID uint) ([]MatchSummary, error)
+	// Delete removes the match together with its messages.
+	Delete(ctx context.Context, id uint) error
 }
 
 type MessageRepository interface {

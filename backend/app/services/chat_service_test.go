@@ -81,6 +81,28 @@ func TestChatService_Messages(t *testing.T) {
 	})
 }
 
+func TestChatService_Unmatch(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("participant ends the match for both users", func(t *testing.T) {
+		svc, _ := newChatFixture()
+
+		require.NoError(t, svc.Unmatch(ctx, 2, 1))
+
+		_, err := svc.Messages(ctx, 1, 1, 0, 10)
+		assert.ErrorIs(t, err, apperr.ErrMatchNotFound)
+	})
+
+	t.Run("outsider gets not found and the match stays", func(t *testing.T) {
+		svc, _ := newChatFixture()
+
+		assert.ErrorIs(t, svc.Unmatch(ctx, 3, 1), apperr.ErrMatchNotFound)
+
+		_, err := svc.Messages(ctx, 1, 1, 0, 10)
+		assert.NoError(t, err)
+	})
+}
+
 func bodies(messages []models.Message) []string {
 	out := make([]string, len(messages))
 	for i, m := range messages {

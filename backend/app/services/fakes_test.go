@@ -118,6 +118,16 @@ func (f *fakeMatches) ListForUser(context.Context, uint) ([]MatchSummary, error)
 	return nil, nil
 }
 
+func (f *fakeMatches) Delete(_ context.Context, id uint) error {
+	for i := range f.rows {
+		if f.rows[i].ID == id {
+			f.rows = append(f.rows[:i], f.rows[i+1:]...)
+			return nil
+		}
+	}
+	return nil
+}
+
 type fakeMessages struct {
 	rows       []models.Message
 	markedUpTo uint
