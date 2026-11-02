@@ -55,6 +55,12 @@ func (r *MatchRepository) FindByID(ctx context.Context, id uint) (*models.Match,
 	return &match, nil
 }
 
+// Delete removes the match; its messages go with it through the foreign key.
+func (r *MatchRepository) Delete(ctx context.Context, id uint) error {
+	_, err := r.query(ctx).Where("id = ?", id).Delete(&models.Match{})
+	return err
+}
+
 const matchSummariesSQL = `
 SELECT m.id AS match_id,
        m.created_at AS matched_at,
